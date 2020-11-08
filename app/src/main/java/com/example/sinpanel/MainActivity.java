@@ -1,9 +1,16 @@
 package com.example.sinpanel;
 
+import androidx.annotation.RestrictTo;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -14,56 +21,56 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    View view;
+
+    LineChart lineChart1;
+    LineChart lineChart2;
+
+    LineChartManager lineChartManager1;
+    LineChartManager lineChartManager2;
+
+    private List<Panel> panelList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LineChart lineChart1 = (LineChart) findViewById(R.id.line_chart1);
-        LineChart lineChart2 = (LineChart) findViewById(R.id.line_chart2);
 
-        LineChartManager lineChartManager1 = new LineChartManager(lineChart1);
-        LineChartManager lineChartManager2 = new LineChartManager(lineChart2);
+        initPanels();
 
-        //设置x轴的数据
-        ArrayList<Float> xValues = new ArrayList<>();
-        for (int i = 0; i <= 10; i++) {
-            xValues.add((float) i);
-        }
+        //初始化面板
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.panel_recycler);
 
-        //设置y轴的数据()
-        List<List<Float>> yValues = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            List<Float> yValue = new ArrayList<>();
-            for (int j = 0; j <= 10; j++) {
-                yValue.add((float) (Math.random() * 80));
-            }
-            yValues.add(yValue);
-        }
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
-        //颜色集合
-        List<Integer> colours = new ArrayList<>();
-        colours.add(Color.GREEN);
-        colours.add(Color.BLUE);
-        colours.add(Color.RED);
-        colours.add(Color.CYAN);
+        recyclerView.setLayoutManager(layoutManager);
 
-        //线的名字集合
-        List<String> names = new ArrayList<>();
-        names.add("折线一");
-        names.add("折线二");
-        names.add("折线三");
-        names.add("折线四");
+        PanelAdapter adapter = new PanelAdapter(panelList);
 
-        //创建多条折线的图表
-        lineChartManager1.showLineChart(xValues, yValues.get(0), names.get(1), colours.get(3));
-        lineChartManager1.setDescription("温度");
-        lineChartManager1.setYAxis(100, 0, 11);
-        lineChartManager1.setHightLimitLine(70,"高温报警",Color.RED);
-
-        lineChartManager2.showLineChart(xValues, yValues, names, colours);
-        lineChartManager2.setYAxis(100, 0, 11);
-        lineChartManager2.setDescription("温度");
+        recyclerView.setAdapter(adapter);
     }
+
+    //初始化面板
+    public void initPanels(){
+
+        view = LayoutInflater.from(MyApplication.getContext()).inflate(R.layout.panel, null);
+
+        lineChart1 = view.findViewById(R.id.left_panel);
+        lineChart2 = view.findViewById(R.id.right_panel);
+//
+//        lineChartManager1 = new LineChartManager(lineChart1);
+//        lineChartManager2 = new LineChartManager(lineChart2);
+
+
+
+        for (int i = 0; i<3;i++){
+            Panel p1 = new Panel(lineChart1, lineChart2);
+            panelList.add(p1);
+
+            Panel p2 = new Panel(lineChart1, lineChart2);
+            panelList.add(p2);
+        }
+    }
+
 }
